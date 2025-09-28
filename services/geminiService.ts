@@ -1,19 +1,20 @@
-// FIX: This file was empty. Implemented Gemini service for virtual try-on.
 import { GoogleGenAI, Modality, Part } from "@google/genai";
 import { Product } from '../types';
 
 const apiKey = process.env.API_KEY;
-if (!apiKey) {
-    console.error("VITE_GEMINI_API_KEY is not set. The app will not function correctly.");
-    throw new Error("VITE_GEMINI_API_KEY is not defined. Please set it in your deployment environment variables.");
+
+export const isApiKeySet = !!apiKey;
+
+let ai: GoogleGenAI | null = null;
+if (isApiKeySet) {
+    ai = new GoogleGenAI({ apiKey });
+} else {
+    console.error("VITE_GEMINI_API_KEY is not set. The app will have limited functionality.");
 }
-const ai = new GoogleGenAI({ apiKey });
 
 
 // Helper function to fetch an image from a URL and convert it to a base64 string
 const urlToBase64 = async (url: string): Promise<{ data: string, mimeType: string }> => {
-    // Note: This may fail in a browser environment if the image server doesn't have permissive CORS headers.
-    // A server-side proxy may be needed in a production environment.
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
@@ -36,8 +37,12 @@ const urlToBase64 = async (url: string): Promise<{ data: string, mimeType: strin
 export const generateTryOnImage = async (
     personImageBase64: string,
     personImageMimeType: string,
-    products: Product[] // Changed to accept an array of products
+    products: Product[]
 ): Promise<string> => {
+    if (!ai) {
+        throw new Error("Gemini API key is not configured. Please set it in your deployment environment variables.");
+    }
+    
     try {
         const personImagePart: Part = {
             inlineData: {
@@ -46,7 +51,6 @@ export const generateTryOnImage = async (
             },
         };
 
-        // Fetch and convert all product images in parallel
         const productPromises = products.map(product => urlToBase64(product.imageUrl));
         const productImages = await Promise.all(productPromises);
 
@@ -57,30 +61,25 @@ export const generateTryOnImage = async (
             },
         }));
 
-        // Create a dynamic prompt for multiple items
         const productNames = products.map(p => `"${p.name}"`).join(', ');
         const textPart: Part = {
             text: `Take the clothing items from the following images and realistically place them on the person in the first image to create a complete outfit. The clothing items are: ${productNames}. The person should be wearing all the items, layered correctly (e.g., a shirt under a jacket). Maintain the original background and the person's pose.`,
         };
 
-
-        // FIX: Use the correct model and parameters for image editing as per guidelines
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash-image-preview',
             contents: {
                 parts: [
                     personImagePart,
-                    ...productImageParts, // Include all product images
+                    ...productImageParts,
                     textPart,
                 ],
             },
             config: {
-                // FIX: responseModalities must include both IMAGE and TEXT
                 responseModalities: [Modality.IMAGE, Modality.TEXT],
             },
         });
         
-        // FIX: Correctly extract the generated image from the response
         if (response.candidates && response.candidates[0].content && response.candidates[0].content.parts) {
             for (const part of response.candidates[0].content.parts) {
                 if (part.inlineData) {

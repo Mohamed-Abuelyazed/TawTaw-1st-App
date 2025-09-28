@@ -7,9 +7,11 @@ import FittingRoom from './components/FittingRoom';
 import CartView from './components/CartView';
 import CheckoutView from './components/CheckoutView';
 import SupportButton from './components/SupportButton';
+import ApiKeyError from './components/ApiKeyError';
 import { products, categories, carouselSlides } from './constants';
 import { Product, Category } from './types';
 import { useTranslation } from './contexts/LanguageContext';
+import { isApiKeySet } from './services/geminiService';
 
 
 function App() {
@@ -18,6 +20,10 @@ function App() {
   const [fittingRoomProducts, setFittingRoomProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
   const { language } = useTranslation();
+
+  if (!isApiKeySet) {
+    return <ApiKeyError />;
+  }
 
   const handleAddToCart = (productToAdd: Product) => {
     setCart(prevCart => {

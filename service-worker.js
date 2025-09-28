@@ -18,20 +18,21 @@ self.addEventListener('install', event => {
   );
 });
 
-// 2. Intercept network requests and serve from cache if available (cache-first strategy)
+// 2. Intercept network requests and serve from network first, falling back to cache.
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response from cache
+    fetch(event.request).catch(() => {
+      // If the network request fails, try to serve from the cache.
+      return caches.match(event.request).then(response => {
         if (response) {
           return response;
         }
-        // Not in cache - fetch from network.
-        return fetch(event.request);
-      })
+        // If not in cache either, it's a genuine error (e.g., offline and page not cached).
+      });
+    })
   );
 });
+
 
 // 3. Clean up old caches when a new service worker is activated
 self.addEventListener('activate', event => {
