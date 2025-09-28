@@ -2,8 +2,13 @@
 import { GoogleGenAI, Modality, Part } from "@google/genai";
 import { Product } from '../types';
 
-// FIX: Initialize the GoogleGenAI client as per guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+const apiKey = process.env.API_KEY;
+if (!apiKey) {
+    console.error("VITE_GEMINI_API_KEY is not set. The app will not function correctly.");
+    throw new Error("VITE_GEMINI_API_KEY is not defined. Please set it in your deployment environment variables.");
+}
+const ai = new GoogleGenAI({ apiKey });
+
 
 // Helper function to fetch an image from a URL and convert it to a base64 string
 const urlToBase64 = async (url: string): Promise<{ data: string, mimeType: string }> => {

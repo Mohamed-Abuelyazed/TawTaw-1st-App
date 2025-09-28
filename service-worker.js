@@ -2,7 +2,7 @@ const CACHE_NAME = 'tawtaw-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/index.tsx', // The browser will request this module
+  '/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'
 ];
