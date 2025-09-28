@@ -1,6 +1,6 @@
 {
-  "name": "TawTaw Virtual Try-On",
-  "description": "An application for TawTaw, a clothing import company, allowing users to virtually try on clothes from men's, women's, and children's sections by uploading their own photo.",
+  "name": "TAWTAW Virtual Try-On",
+  "description": "An application for TAWTAW, a clothing import company, allowing users to virtually try on clothes from men's, women's, and children's sections by uploading their own photo.",
   "requestFramePermissions": [
     "camera"
   ]

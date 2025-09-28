@@ -9,7 +9,9 @@ import { Product, Category, CarouselSlide } from './types';
 export const categories: Category[] = ['Men', 'Women', 'Kids', 'Shoes', 'Accessories'];
 
 export const products: Product[] = [
+
   // Women
+  
   {
     id: 1,
     name: 'Julia Embroidered Blouse',
@@ -18,48 +20,115 @@ export const products: Product[] = [
     category: 'Women',
   },
   {
-    id: 101,
-    name: 'Light Blue Jeans',
-    price: 150,
-    imageUrl: 'https://images.pexels.com/photos/1082528/pexels-photo-1082528.jpeg?auto=compress&cs=tinysrgb&w=600',
+    id: 2,
+    name: 'Andora Women\'s Knitted Fleece Hooded Sweater',
+    price: 450,
+    imageUrl: 'https://m.media-amazon.com/images/I/61E42HmHpXL._AC_SX679_.jpg',
     category: 'Women',
   },
   {
-    id: 102,
-    name: 'Floral Summer Dress',
+    id: 3,
+    name: 'Girls . Women\'s High Waist Star Print Wide Leg Joggers - Modern and Comfortable Fashion from Meeza',
     price: 220,
-    imageUrl: 'https://images.pexels.com/photos/2235832/pexels-photo-2235832.jpeg?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://m.media-amazon.com/images/I/61PmBlCcaTL._AC_SY741_.jpg',
     category: 'Women',
   },
+  {
+    id: 4,
+    name: 'Women\'s wide leg high waisted trousers with elastic and drawstring - comfortable and stylish for home and going out from Romba',
+    price: 220,
+    imageUrl: 'https://m.media-amazon.com/images/I/61qQLTz0SLL._AC_SY741_.jpg',
+    category: 'Women',
+  },
+  {
+    id: 103,
+    name: 'Karina Women\'s Elegant Fishnet Beach Shirt',
+    price: 640,
+    imageUrl: 'https://m.media-amazon.com/images/I/513ZeeMv+5L._AC_SY741_.jpg',
+    category: 'Women',
+  },
+
   // Men
+  
   {
     id: 201,
-    name: 'White Cotton T-Shirt',
-    price: 75,
-    imageUrl: 'https://images.pexels.com/photos/428338/pexels-photo-428338.jpeg?auto=compress&cs=tinysrgb&w=600',
+    name: 'Firewood Men\'s Classic Basic Short Sleeve Shirt',
+    price: 250,
+    imageUrl: 'https://m.media-amazon.com/images/I/71q8YfkqSEL._AC_SY741_.jpg',
     category: 'Men',
   },
   {
     id: 202,
-    name: 'Black Printed T-Shirt',
-    price: 85,
-    imageUrl: 'https://images.pexels.com/photos/1232459/pexels-photo-1232459.jpeg?auto=compress&cs=tinysrgb&w=600',
+    name: 'Andorra Men\'s Long Sleeve Western Style Oxford Cotton Shirt',
+    price: 330,
+    imageUrl: 'https://m.media-amazon.com/images/I/61LNbM9dI4L._AC_SX679_.jpg',
     category: 'Men',
   },
+  {
+    id: 203,
+    name: 'Avon Men\'s Plaid Shirt with Two Front Pockets',
+    price: 330,
+    imageUrl: 'https://m.media-amazon.com/images/I/410CZ3HdnmL._AC_.jpg',
+    category: 'Men',
+  },
+  {
+    id: 204,
+    name: 'Men\'s Oversized Cotton T-Shirt - Casual Graphic Print Short Sleeve Crew Neck Slim Fit Relaxed Fit',
+    price: 330,
+    imageUrl: 'https://m.media-amazon.com/images/I/719VjDS7NxL._AC_SX679_.jpg',
+    category: 'Men',
+  },
+  {
+    id: 205,
+    name: 'New casual lightning and thunder t-shirt for youth and men from Meeza',
+    price: 330,
+    imageUrl: 'https://m.media-amazon.com/images/I/711jT-lhO4L._AC_SX679_.jpg',
+    category: 'Men',
+  },
+  {
+    id: 206,
+    name: 'Andora Men\'s Casual Elastic Waist Drawstring Trousers with Side Pockets',
+    price: 330,
+    imageUrl: 'https://m.media-amazon.com/images/I/61+bSl3DQdL._AC_SX342_SY445_QL70_ML2_.jpg',
+    category: 'Men',
+  },
+  {
+    id: 207,
+    name: 'Dot Jeans Wear Men\'s Boyfriend Jeans',
+    price: 330,
+    imageUrl: 'https://m.media-amazon.com/images/I/51WnJqrpfeL._AC_SX679_.jpg',
+    category: 'Men',
+  },
+
   // Kids
   {
     id: 301,
-    name: 'Kids Graphic Tee',
-    price: 90,
-    imageUrl: 'https://images.pexels.com/photos/1620760/pexels-photo-1620760.jpeg?auto=compress&cs=tinysrgb&w=600',
+    name: 'Boys\' 2-Piece Winter Tracksuit - Hooded Sweatshirt and Joggers - Multicolor',
+    price: 500,
+    imageUrl: 'https://m.media-amazon.com/images/I/31pxAHUyFFL._AC_.jpg',
     category: 'Kids',
   },
+  {
+    id: 302,
+    name: 'Andora Boys\' Checked Quilted Hooded Jacket',
+    price: 500,
+    imageUrl: 'https://m.media-amazon.com/images/I/71LDqC-mdtL._AC_SX679_.jpg',
+    category: 'Kids',
+  },
+
   // Shoes
   {
     id: 401,
-    name: 'White Sneakers',
+    name: 'Women\'s Casual Sneakers - Lightweight - Natural Materials Resistant to Bacteria, Fungi and Odors - Colors {Grey, Black & White} - (Model 7)',
     price: 350,
-    imageUrl: 'https://images.pexels.com/photos/267320/pexels-photo-267320.jpeg?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://m.media-amazon.com/images/I/7132xNFxdiL._AC_SY575_.jpg',
+    category: 'Shoes',
+  },
+  {
+    id: 402,
+    name: 'Mintra Men\'s Kai Wire Sneaker',
+    price: 250,
+    imageUrl: 'https://m.media-amazon.com/images/I/71h2dJuUejL._AC_SY695_.jpg',
     category: 'Shoes',
   },
   // Accessories
@@ -77,14 +146,19 @@ export const carouselSlides: CarouselSlide[] = [
         id: 1,
         titleKey: 'latestCollections',
         subtitleKey: 'discoverSummer',
-        imageUrl: 'https://via.placeholder.com/1200x400.png/CCCCCC/FFFFFF?text=Summer+Collection',
+        imageUrl: 'https://i.ibb.co/NgDY3fhP/Generated-Image-September-29-2025-12-19-AM.png',
     },
     {
         id: 2,
         titleKey: 'saleUpTo50',
         subtitleKey: 'midSeasonSale',
-        imageUrl: 'https://via.placeholder.com/1200x400.png/AAAAAA/FFFFFF?text=Sale+50%25',
+        imageUrl: 'https://i.ibb.co/m5K7NFG1/a-stylish-and-modern-social-media-promotional-image-for-tawtaw-clothing-brand-showcase-trendy-and-c.jpg',
     },
+    {
+        id: 3,
+        titleKey: 'saleUpTo50',
+        subtitleKey: 'midSeasonSale',
+        imageUrl: 'https://i.ibb.co/pjbrf1Fd/Generated-Image-September-29-2025-12-23-AM.png',}
 ];
 
 export const governorates: string[] = [

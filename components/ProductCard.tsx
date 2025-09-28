@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Product } from '../types';
 import { useTranslation } from '../contexts/LanguageContext';
 
@@ -10,6 +10,15 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onVirtualTryOn, onAddToCart }) => {
   const { t } = useTranslation();
+  const [isAdded, setIsAdded] = useState(false);
+
+  const handleVirtualTryOnClick = () => {
+    onVirtualTryOn(product);
+    setIsAdded(true);
+    setTimeout(() => {
+        setIsAdded(false);
+    }, 2000);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
@@ -25,10 +34,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onVirtualTryOn, onAd
             {t('addToCart')}
           </button>
           <button
-            onClick={() => onVirtualTryOn(product)}
-            className="w-full bg-slate-200 text-slate-800 font-bold py-2 px-2 rounded-lg hover:bg-slate-300 transition-colors text-sm"
+            onClick={handleVirtualTryOnClick}
+            disabled={isAdded}
+            className={`w-full font-bold py-2 px-2 rounded-lg transition-colors text-sm ${
+                isAdded 
+                ? 'bg-green-500 text-white cursor-default'
+                : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+            }`}
           >
-            {t('virtualTryOn')}
+            {isAdded ? t('addedToFittingRoom') : t('virtualTryOn')}
           </button>
         </div>
       </div>

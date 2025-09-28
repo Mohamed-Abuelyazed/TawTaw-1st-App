@@ -1,0 +1,22 @@
+{
+  "name": "TAWTAW",
+  "short_name": "TAWTAW",
+  "description": "تجربة ملابس افتراضية مع TAWTAW. اختر من تشكيلاتنا الرجالية والنسائية والأطفال.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
