@@ -60,7 +60,14 @@ const urlToBase64 = (url: string): Promise<{ data: string, mimeType: string }> =
             reject(new Error(`Could not load image from URL: ${url}. This may be a cross-origin (CORS) issue.`));
         };
         
-        img.src = url;
+        let imageUrl = url;
+        // Use a CORS proxy for image domains that are known to block cross-origin requests, like Amazon.
+        // This allows the canvas to access the image data.
+        if (url.includes('m.media-amazon.com')) {
+            imageUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+        }
+
+        img.src = imageUrl;
     });
 };
 
