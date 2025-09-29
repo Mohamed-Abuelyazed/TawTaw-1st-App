@@ -14,25 +14,42 @@ if (isApiKeySet) {
 
 
 // Helper function to fetch an image from a URL and convert it to a base64 string
-const urlToBase64 = async (url: string): Promise<{ data: string, mimeType: string }> => {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
-    }
-    const blob = await response.blob();
+const urlToBase64 = (url: string): Promise<{ data: string, mimeType: string }> => {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            if (reader.error) {
-                return reject(reader.error);
+        const img = new Image();
+        img.crossOrigin = 'Anonymous'; // This is crucial for fetching images from other domains
+        
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (!ctx) {
+                return reject(new Error('Could not get canvas context.'));
             }
-            const base64Data = (reader.result as string).split(',')[1];
-            resolve({ data: base64Data, mimeType: blob.type });
+
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            
+            ctx.drawImage(img, 0, 0);
+            
+            // toDataURL defaults to image/png. We extract the mimeType from the resulting data URL.
+            const dataUrl = canvas.toDataURL();
+            const mimeType = dataUrl.substring(dataUrl.indexOf(":") + 1, dataUrl.indexOf(";"));
+            const base64Data = dataUrl.split(',')[1];
+            
+            resolve({ data: base64Data, mimeType });
         };
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(blob);
+        
+        img.onerror = (err) => {
+            // This often happens due to CORS errors if the server doesn't send the right headers.
+            console.error(`Failed to load image for canvas processing (CORS issue likely): ${url}`, err);
+            reject(new Error(`Could not load image from URL: ${url}. This may be a cross-origin (CORS) issue.`));
+        };
+        
+        img.src = url;
     });
 };
+
 
 export const generateTryOnImage = async (
     personImageBase64: string,
