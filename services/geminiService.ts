@@ -27,14 +27,28 @@ const urlToBase64 = (url: string): Promise<{ data: string, mimeType: string }> =
                 return reject(new Error('Could not get canvas context.'));
             }
 
-            canvas.width = img.naturalWidth;
-            canvas.height = img.naturalHeight;
+            const MAX_DIMENSION = 512;
+            let { naturalWidth: width, naturalHeight: height } = img;
+
+            if (width > height) {
+                if (width > MAX_DIMENSION) {
+                    height *= MAX_DIMENSION / width;
+                    width = MAX_DIMENSION;
+                }
+            } else {
+                if (height > MAX_DIMENSION) {
+                    width *= MAX_DIMENSION / height;
+                    height = MAX_DIMENSION;
+                }
+            }
             
-            ctx.drawImage(img, 0, 0);
+            canvas.width = width;
+            canvas.height = height;
             
-            // toDataURL defaults to image/png. We extract the mimeType from the resulting data URL.
-            const dataUrl = canvas.toDataURL();
-            const mimeType = dataUrl.substring(dataUrl.indexOf(":") + 1, dataUrl.indexOf(";"));
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const dataUrl = canvas.toDataURL('image/png');
+            const mimeType = 'image/png';
             const base64Data = dataUrl.split(',')[1];
             
             resolve({ data: base64Data, mimeType });
