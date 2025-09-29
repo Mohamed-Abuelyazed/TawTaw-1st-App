@@ -21,10 +21,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [language]);
 
   const t = (key: TranslationKey): string => {
-    // FIX: Add type assertion and a fallback to the key itself for robustness.
-    const typedKey = key as keyof typeof translations.en;
     // Fallback to English if a key is missing in the current language, then fallback to the key itself.
-    return translations[language][typedKey] || translations['en'][typedKey] || key;
+    return translations[language][key] || translations['en'][key] || key;
   };
 
   return (

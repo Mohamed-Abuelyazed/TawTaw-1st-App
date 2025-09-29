@@ -1,9 +1,17 @@
-// FIX: This file was empty. Implemented the FittingRoom component for the virtual try-on feature.
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { Product } from '../types';
 import { useTranslation } from '../contexts/LanguageContext';
 import { generateTryOnImage } from '../services/geminiService';
 import Loader from './Loader';
+
+// Helper to convert file to base64
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
 
 interface FittingRoomProps {
   products: Product[];
@@ -11,198 +19,148 @@ interface FittingRoomProps {
 
 const FittingRoom: React.FC<FittingRoomProps> = ({ products }) => {
   const { t } = useTranslation();
-  const [personImage, setPersonImage] = useState<{
-    base64: string;
-    mimeType: string;
-    previewUrl: string;
-  } | null>(null);
-  // State changed to handle multiple product selections
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [personImage, setPersonImage] = useState<{ file: File; base64: string } | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const MAX_WIDTH = 1024;
-            const MAX_HEIGHT = 1024;
-            let width = img.width;
-            let height = img.height;
-
-            if (width > height) {
-                if (width > MAX_WIDTH) {
-                    height *= MAX_WIDTH / width;
-                    width = MAX_WIDTH;
-                }
-            } else {
-                if (height > MAX_HEIGHT) {
-                    width *= MAX_HEIGHT / height;
-                    height = MAX_HEIGHT;
-                }
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-            ctx.drawImage(img, 0, 0, width, height);
-
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            const base64String = dataUrl.split(',')[1];
-            
-            setPersonImage({
-                base64: base64String,
-                mimeType: 'image/jpeg',
-                previewUrl: dataUrl
-            });
-            setGeneratedImage(null);
-            setError(null);
-        };
-        img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    if (file) {
+      try {
+        const base64 = await toBase64(file);
+        setPersonImage({ file, base64 });
+        setGeneratedImage(null); // Clear previous result on new image upload
+        setError(null);
+      } catch (err) {
+        setError(t('generationFailedError'));
+        console.error("Error converting file to base64:", err);
+      }
+    }
   };
 
-  // Handler to toggle product selection
-  const handleProductSelect = (product: Product) => {
-    setSelectedProducts(prevSelected => {
-        const isSelected = prevSelected.find(p => p.id === product.id);
-        if (isSelected) {
-            return prevSelected.filter(p => p.id !== product.id);
-        } else {
-            return [...prevSelected, product];
-        }
-    });
-  };
-
-  const handleGenerateClick = useCallback(async () => {
-    // Check for multiple products
-    if (!personImage || selectedProducts.length === 0) {
+  const handleGenerateClick = async () => {
+    if (!personImage || products.length === 0) {
       setError(t('selectImageAndProductError'));
       return;
     }
 
     setIsLoading(true);
-    setGeneratedImage(null);
     setError(null);
+    setGeneratedImage(null);
 
     try {
-      // Pass array of products to the service
-      const resultBase64 = await generateTryOnImage(
-        personImage.base64,
-        personImage.mimeType,
-        selectedProducts
-      );
+        // Extract base64 data and mime type from the data URL
+      const [header, base64Data] = personImage.base64.split(',');
+      const mimeType = header.match(/:(.*?);/)?.[1] || 'image/jpeg';
+      
+      const resultBase64 = await generateTryOnImage(base64Data, mimeType, products);
       setGeneratedImage(`data:image/png;base64,${resultBase64}`);
-    } catch (e: any) {
-      if (e.message === 'QUOTA_EXCEEDED') {
-        setError(t('quotaExceededError'));
-      } else {
-        setError(e.message || t('generationFailedError'));
+    } catch (err: any) {
+      console.error('Image generation failed:', err);
+      if (err.message.includes('quota')) {
+          setError(t('quotaExceededError'));
+      } else if (err.message.includes('Could not load') || err.message.includes('Failed to fetch')) {
+          setError(err.message);
+      }
+       else {
+          setError(`${t('generationFailedError')}: ${err.message}`);
       }
     } finally {
       setIsLoading(false);
     }
-  }, [personImage, selectedProducts, t]);
-
-  const triggerFileUpload = () => {
-    fileInputRef.current?.click();
   };
-
-  if (products.length === 0) {
-      return (
-        <div className="text-center py-16 bg-white rounded-lg shadow-lg p-8">
-            <h1 className="text-3xl font-bold mb-4 text-slate-800">{t('fittingRoom')}</h1>
-            <p className="text-slate-500 text-xl">{t('fittingRoomEmpty')}</p> 
-            <p className="text-slate-400 mt-2">{t('fittingRoomEmptyHint')}</p>
-        </div>
-      )
-  }
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 md:p-8">
       <h1 className="text-3xl font-bold mb-6 text-slate-800 text-center">{t('fittingRoom')}</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <div className="lg:col-span-1 flex flex-col space-y-6">
-          <div className="text-center p-4 border-2 border-dashed rounded-lg">
-            <h2 className="text-xl font-semibold mb-2">{t('step1Upload')}</h2>
-            <input
-              type="file"
-              accept="image/png, image/jpeg"
-              onChange={handleImageUpload}
-              ref={fileInputRef}
-              className="hidden"
-            />
-            <button
-              onClick={triggerFileUpload}
-              className="w-full bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-lg hover:bg-slate-300 transition-colors"
-            >
-              {personImage ? t('changeYourImage') : t('uploadYourImage')}
-            </button>
-            {personImage && <img src={personImage.previewUrl} alt="Your upload" className="mt-4 rounded-lg mx-auto max-h-48" />}
-          </div>
-
-          <div className="p-4 border-2 border-dashed rounded-lg flex-grow">
-            <h2 className="text-xl font-semibold mb-3 text-center">{t('step2Select')}</h2>
-            <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto">
-              {products.map(p => {
-                const isSelected = selectedProducts.some(sp => sp.id === p.id);
-                return (
-                  <div
-                    key={p.id}
-                    onClick={() => handleProductSelect(p)}
-                    className={`relative cursor-pointer border-2 rounded-lg p-1 transition-all ${isSelected ? 'border-slate-900 scale-105' : 'border-transparent hover:border-slate-300'}`}
-                  >
-                    <img src={p.imageUrl} alt={t(p.name)} className="w-full h-24 object-cover rounded-md" />
-                    {isSelected && (
-                      <div className="absolute inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center rounded-md m-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+      
+      {products.length === 0 ? (
+         <div className="text-center py-16">
+            <p className="text-slate-500 text-xl">{t('fittingRoomEmpty')}</p> 
+            <p className="text-slate-400 mt-2">{t('fittingRoomEmptyHint')}</p>
         </div>
-
-        <div className="lg:col-span-2 bg-slate-100 rounded-lg p-4 flex flex-col items-center justify-center min-h-[400px] lg:min-h-[600px] relative">
-            {!generatedImage && !isLoading && (
-                <div className="text-center text-slate-500">
-                    <p className="text-lg font-semibold">{t('yourVirtualTryOn')}</p>
-                    <p>{t('yourImageWillAppearHere')}</p>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-8">
+            {/* Left Column: Controls */}
+            <div className="space-y-6">
+                {/* Step 1: Upload Image */}
+                <div>
+                    <h2 className="text-xl font-bold text-slate-700 mb-3">{t('step1Upload')}</h2>
+                    <div className="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            ref={fileInputRef}
+                            className="hidden"
+                        />
+                        {personImage ? (
+                            <div className="flex flex-col items-center">
+                                <img src={personImage.base64} alt="User" className="w-32 h-32 object-cover rounded-lg mb-4" />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full bg-slate-200 text-slate-800 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors"
+                                >
+                                    {t('changeYourImage')}
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full bg-slate-900 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-700 transition-colors"
+                            >
+                                {t('uploadYourImage')}
+                            </button>
+                        )}
+                    </div>
                 </div>
-            )}
-            {isLoading && <Loader messageKey="generatingImage" />}
-            {error && <div className="text-center text-red-500 p-4">
-              <p className="font-bold">{t('errorOccurred')}</p>
-              <p>{error}</p>
-            </div>}
-            {generatedImage && !isLoading && (
-              <img src={generatedImage} alt="Virtual try-on result" className="max-w-full max-h-full object-contain rounded-lg" />
-            )}
 
-            <button
-                onClick={handleGenerateClick}
-                disabled={!personImage || selectedProducts.length === 0 || isLoading}
-                className="absolute bottom-6 bg-slate-900 text-white font-bold py-3 px-12 rounded-lg hover:bg-slate-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed text-lg shadow-lg"
-            >
-                {t('generate')}
-            </button>
+                {/* Step 2: Selected Items */}
+                <div>
+                    <h2 className="text-xl font-bold text-slate-700 mb-3">{t('step2Select')}</h2>
+                    <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                        {products.map(p => (
+                            <div key={p.id} className="flex items-center bg-slate-100 p-2 rounded-md">
+                                <img src={p.imageUrl} alt={t(p.name)} className="w-12 h-12 object-cover rounded-md mr-4 rtl:mr-0 rtl:ml-4" />
+                                <span className="text-sm font-semibold text-slate-700">{t(p.name)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <button
+                    onClick={handleGenerateClick}
+                    disabled={isLoading || !personImage}
+                    className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-500 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed text-lg"
+                >
+                    {isLoading ? t('generatingImage') : t('generate')}
+                </button>
+            </div>
+
+            {/* Right Column: Result */}
+            <div className="bg-slate-100 rounded-lg flex items-center justify-center min-h-[400px] p-4 relative overflow-hidden">
+                {isLoading && <Loader messageKey="generatingImage" />}
+                {!isLoading && generatedImage && (
+                    <img src={generatedImage} alt="Virtual Try-On Result" className="max-w-full max-h-full object-contain rounded-md" />
+                )}
+                {!isLoading && !generatedImage && !error && (
+                    <div className="text-center text-slate-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        <p className="mt-2 font-semibold">{t('yourVirtualTryOn')}</p>
+                        <p className="text-sm">{t('yourImageWillAppearHere')}</p>
+                    </div>
+                )}
+                 {error && !isLoading && (
+                    <div className="absolute inset-0 bg-red-100 text-red-800 p-4 flex flex-col items-center justify-center text-center rounded-lg">
+                        <h3 className="font-bold text-lg">{t('errorOccurred')}</h3>
+                        <p className="mt-1 text-sm">{error}</p>
+                    </div>
+                 )}
+            </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

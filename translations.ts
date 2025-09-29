@@ -14,6 +14,9 @@ export const translations: Record<Language, Record<string, string>> = {
     price: "Price",
     currency: "EGP",
     generatingImage: "Generating Your Image...",
+    stylingYourLook: "Styling your look...",
+    fittingTheClothes: "Fitting the clothes perfectly...",
+    almostThere: "Almost there...",
     pleaseWait: "This might take a moment.",
     shoppingCart: "Shopping Cart",
     cartEmpty: "Your cart is empty.",
@@ -58,8 +61,8 @@ export const translations: Record<Language, Record<string, string>> = {
     generate: "Generate",
     errorOccurred: "An Error Occurred",
     selectImageAndProductError: "Please upload your image and select at least one item to try on.",
-    generationFailedError: "Failed to generate the image. Please try again.",
-    quotaExceededError: "The service is temporarily busy due to high demand. Please wait a while and try again.",
+    generationFailedError: "Failed to generate the image. Please try again",
+    quotaExceededError: "The daily API quota has been reached. Please try again later.",
 
 
     // Products
@@ -126,6 +129,9 @@ export const translations: Record<Language, Record<string, string>> = {
     price: "السعر",
     currency: "جنيه",
     generatingImage: "جاري إنشاء صورتك...",
+    stylingYourLook: "نقوم بتنسيق إطلالتك...",
+    fittingTheClothes: "نضبط المقاسات بإتقان...",
+    almostThere: "أوشكنا على الانتهاء...",
     pleaseWait: "قد يستغرق هذا بعض الوقت.",
     shoppingCart: "عربة التسوق",
     cartEmpty: "عربة التسوق فارغة.",
@@ -170,8 +176,8 @@ export const translations: Record<Language, Record<string, string>> = {
     generate: "إنشاء",
     errorOccurred: "حدث خطأ",
     selectImageAndProductError: "يرجى رفع صورتك واختيار منتج واحد على الأقل لتجربته.",
-    generationFailedError: "فشل إنشاء الصورة. يرجى المحاولة مرة أخرى.",
-    quotaExceededError: "الخدمة مشغولة مؤقتًا بسبب كثرة الطلبات. يرجى الانتظار قليلًا والمحاولة مرة أخرى.",
+    generationFailedError: "فشل إنشاء الصورة. يرجى المحاولة مرة أخرى",
+    quotaExceededError: "تم الوصول إلى الحد اليومي لواجهة برمجة التطبيقات. يرجى المحاولة مرة أخرى لاحقًا.",
 
     // Products
     'Julia Embroidered Blouse': 'بلوزة جوليا المطرزة',
