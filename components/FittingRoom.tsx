@@ -104,7 +104,11 @@ const FittingRoom: React.FC<FittingRoomProps> = ({ products }) => {
       );
       setGeneratedImage(`data:image/png;base64,${resultBase64}`);
     } catch (e: any) {
-      setError(e.message || t('generationFailedError'));
+      if (e.message === 'QUOTA_EXCEEDED') {
+        setError(t('quotaExceededError'));
+      } else {
+        setError(e.message || t('generationFailedError'));
+      }
     } finally {
       setIsLoading(false);
     }

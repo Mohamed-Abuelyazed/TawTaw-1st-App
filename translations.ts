@@ -59,6 +59,8 @@ export const translations: Record<Language, Record<string, string>> = {
     errorOccurred: "An Error Occurred",
     selectImageAndProductError: "Please upload your image and select at least one item to try on.",
     generationFailedError: "Failed to generate the image. Please try again.",
+    quotaExceededError: "The service is temporarily busy due to high demand. Please wait a while and try again.",
+
 
     // Products
     'Julia Embroidered Blouse': 'Julia Embroidered Blouse',
@@ -169,6 +171,7 @@ export const translations: Record<Language, Record<string, string>> = {
     errorOccurred: "حدث خطأ",
     selectImageAndProductError: "يرجى رفع صورتك واختيار منتج واحد على الأقل لتجربته.",
     generationFailedError: "فشل إنشاء الصورة. يرجى المحاولة مرة أخرى.",
+    quotaExceededError: "الخدمة مشغولة مؤقتًا بسبب كثرة الطلبات. يرجى الانتظار قليلًا والمحاولة مرة أخرى.",
 
     // Products
     'Julia Embroidered Blouse': 'بلوزة جوليا المطرزة',
